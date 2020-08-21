@@ -23,7 +23,7 @@
 /// dppl_sycl_queue_interface.hpp.
 ///
 //===----------------------------------------------------------------------===//
-#include "dppl_sycl_queue_interface.hpp"
+#include "dppl_sycl_queue_interface.h"
 #include "dppl_error_codes.hpp"
 #include <cassert>
 #include <iomanip>
@@ -35,7 +35,6 @@
 #include <CL/sycl.hpp>                /* SYCL headers   */
 
 using namespace cl::sycl;
-using namespace dppl;
 
 /*------------------------------- Private helpers ----------------------------*/
 
@@ -321,7 +320,7 @@ QMgrHelper::removeCurrentQueue ()
 /*!
  * Delete the passed in pointer after verifying it points to a sycl::queue.
  */
-int64_t dppl::deleteQueue (void *Q)
+int64_t DPPLDeleteQueue (void *Q)
 {
     delete static_cast<queue*>(Q);
     return DPPL_SUCCESS;
@@ -337,7 +336,7 @@ int64_t dppl::deleteQueue (void *Q)
  * Currently, device name, driver version, device vendor, and device profile
  * are printed out. More attributed may be added later.
  */
-int64_t DpplSyclQueueManager::dumpDeviceInfo (const void *QPtr) const
+int64_t DpplDumpDeviceInfo (const void *QPtr)
 {
     auto Q = static_cast<const queue*>(QPtr);
     dump_device_info(Q->get_device());
@@ -353,7 +352,7 @@ int64_t DpplSyclQueueManager::dumpDeviceInfo (const void *QPtr) const
  * to check if the queue manager was properly initialized.
  *
  */
-int64_t DpplSyclQueueManager::dump () const
+int64_t DpplDumpPlatformInfo ()
 {
     size_t i = 0;
 
@@ -392,7 +391,7 @@ int64_t DpplSyclQueueManager::dump () const
 /*!
  * Returns inside the platform param the number of Sycl platforms on the system.
  */
-int64_t DpplSyclQueueManager::getNumPlatforms (size_t &platforms) const
+int64_t DpplGetNumPlatforms (size_t &platforms)
 {
     platforms = platform::get_platforms().size();
     return DPPL_SUCCESS;
@@ -402,7 +401,7 @@ int64_t DpplSyclQueueManager::getNumPlatforms (size_t &platforms) const
  * Returns inside the numQueues param the number of activated queues not
  * including the global queue that should always be activated.
  */
-int64_t DpplSyclQueueManager::getNumActivatedQueues (size_t &numQueues) const
+int64_t DpplGetNumActivatedQueues (size_t &numQueues)
 {
     if (QMgrHelper::active_queues.empty())
         return error_reporter("No active contexts");
@@ -413,7 +412,7 @@ int64_t DpplSyclQueueManager::getNumActivatedQueues (size_t &numQueues) const
 /*!
  * Returns the number of CPU queues.
  */
-int64_t DpplSyclQueueManager::getNumCPUQueues (size_t &numQueues) const
+int64_t DpplGetNumCPUQueues (size_t &numQueues)
 {
     numQueues = QMgrHelper::cpu_queues.size();
     return DPPL_SUCCESS;
@@ -422,7 +421,7 @@ int64_t DpplSyclQueueManager::getNumCPUQueues (size_t &numQueues) const
 /*!
  * Returns the number of GPU queues.
  */
-int64_t DpplSyclQueueManager::getNumGPUQueues (size_t &numQueues) const
+int64_t DpplGetNumGPUQueues (size_t &numQueues)
 {
     numQueues = QMgrHelper::gpu_queues.size();
     return DPPL_SUCCESS;
@@ -431,7 +430,7 @@ int64_t DpplSyclQueueManager::getNumGPUQueues (size_t &numQueues) const
 /*!
  * Returns a copy of the current queue inside the Ptr2QPtr param.
  */
-int64_t DpplSyclQueueManager::getCurrentQueue (void **Ptr2QPtr) const
+int64_t DpplGetCurrentQueue (void **Ptr2QPtr)
 {
     return QMgrHelper::getCurrentQueue(Ptr2QPtr);
 }
@@ -440,9 +439,9 @@ int64_t DpplSyclQueueManager::getCurrentQueue (void **Ptr2QPtr) const
  * Returns inside the Ptr2QPtr param a copy of a sycl::queue corresponding to
  * the specified device type and device number.
  */
-int64_t DpplSyclQueueManager::getQueue (void **Ptr2QPtr,
-                                        sycl_device_type DeviceTy,
-                                        size_t DNum) const
+int64_t DpplGetQueue (void **Ptr2QPtr,
+                      sycl_device_type DeviceTy,
+                      size_t DNum)
 {
     return QMgrHelper::getQueue(Ptr2QPtr, DeviceTy, DNum);
 }
@@ -453,8 +452,7 @@ int64_t DpplSyclQueueManager::getQueue (void **Ptr2QPtr,
  * of given type and id. If no such device exists and the queue does not
  * exist, then DPPL_FAILURE is returned.
  */
-int64_t DpplSyclQueueManager::setAsDefaultQueue (sycl_device_type DeviceTy,
-                                                 size_t DNum)
+int64_t DpplSetAsDefaultQueue (sycl_device_type DeviceTy, size_t DNum)
 {
     return QMgrHelper::setAsDefaultQueue(DeviceTy, DNum);
 }
@@ -464,9 +462,9 @@ int64_t DpplSyclQueueManager::setAsDefaultQueue (sycl_device_type DeviceTy,
  * queue is returned to the caller inside the Ptr2QPtr param.
  */
 int64_t
-DpplSyclQueueManager::setAsCurrentQueue (void **Ptr2QPtr,
-                                         sycl_device_type DeviceTy,
-                                         size_t DNum)
+DpplSetAsCurrentQueue (void **Ptr2QPtr,
+                       sycl_device_type DeviceTy,
+                       size_t DNum)
 {
     return QMgrHelper::setAsCurrentQueue(Ptr2QPtr, DeviceTy, DNum);
 }
@@ -476,7 +474,7 @@ DpplSyclQueueManager::setAsCurrentQueue (void **Ptr2QPtr,
  * sycl::queues. Returns DPPL_ERROR if the stack has no activated queues other
  * than the default global queue.
  */
-int64_t DpplSyclQueueManager::removeCurrentQueue ()
+int64_t DpplRemoveCurrentQueue ()
 {
     return QMgrHelper::removeCurrentQueue();
 }

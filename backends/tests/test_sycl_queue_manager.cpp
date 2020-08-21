@@ -1,4 +1,4 @@
-#include "dppl_sycl_queue_interface.hpp"
+#include "dppl_sycl_queue_interface.h"
 #include "dppl_error_codes.hpp"
 #include <gtest/gtest.h>
 #include <iostream>
@@ -9,33 +9,35 @@ using namespace dppl;
 
 namespace
 {
-    void foo (DpplSyclQueueManager & qmgr, size_t & num)
+    void foo (size_t & num)
     {
         void *q1, *q2;
 
-        qmgr.setAsCurrentQueue(&q1, sycl_device_type::DPPL_CPU, 0);
-        qmgr.setAsCurrentQueue(&q2, sycl_device_type::DPPL_GPU, 0);
+        DPPLSetAsCurrentQueue(&q1, dppl_sycl_device_type::DPPL_CPU, 0);
+        DPPLSetAsCurrentQueue(&q2, dppl_sycl_device_type::DPPL_GPU, 0);
         // Capture the number of active queues in first
-        qmgr.getNumActivatedQueues(num);
-        qmgr.removeCurrentQueue();
-        qmgr.removeCurrentQueue();
+        DPPLGetNumActivatedQueues(num);
+        DPPLRemoveCurrentQueue();
+        DPPLRemoveCurrentQueue();
+        DPPLDeleteQueue(q1);
+        DPPLDeleteQueue(q2);
     }
 
-    void bar (DpplSyclQueueManager & qmgr, size_t & num)
+    void bar (size_t & num)
     {
         void *q1;
 
-        qmgr.setAsCurrentQueue(&q1, sycl_device_type::DPPL_GPU, 0);
+        DPPLSetAsCurrentQueue(&q1, sycl_device_type::DPPL_GPU, 0);
         // Capture the number of active queues in second
-        qmgr.getNumActivatedQueues(num);
-        qmgr.removeCurrentQueue();
+        DPPLGetNumActivatedQueues(num);
+        DPPLRemoveCurrentQueue();
+        DPPLDeleteQueue(q1);
     }
 }
 
 struct TestDPPLSyclQueuemanager : public ::testing::Test
 {
-protected:
-  DpplSyclQueueManager qmgr;
+
 };
 
 TEST_F (TestDPPLSyclQueuemanager, CheckGetNumPlatforms)
@@ -51,7 +53,7 @@ TEST_F (TestDPPLSyclQueuemanager, CheckGetNumActivatedQueues)
     void *q;
 
     // Add a queue to main thread
-    qmgr.setAsCurrentQueue(&q, sycl_device_type::DPPL_CPU, 0);
+    qmgr.setAsCurrentQueue(&q, dppl_sycl_device_type::DPPL_CPU, 0);
 
     std::thread first (foo, std::ref(qmgr), std::ref(num1));
     std::thread second (bar, std::ref(qmgr), std::ref(num2));
@@ -61,9 +63,9 @@ TEST_F (TestDPPLSyclQueuemanager, CheckGetNumActivatedQueues)
     second.join();
 
     // Capture the number of active queues in first
-    qmgr.getNumActivatedQueues(num0);
-    qmgr.removeCurrentQueue();
-    qmgr.getNumActivatedQueues(num4);
+    DPPLGetNumActivatedQueues(num0);
+    DPPLRemoveCurrentQueue();
+    DPPLGetNumActivatedQueues(num4);
 
     // Verify what the expected number of activated queues each time a thread
     // called getNumActivatedQueues.
@@ -72,7 +74,7 @@ TEST_F (TestDPPLSyclQueuemanager, CheckGetNumActivatedQueues)
     EXPECT_EQ(num2, 1);
     EXPECT_EQ(num4, 0);
 
-    deleteQueue(q);
+    DPPLDeleteQueue(q);
 }
 
 int

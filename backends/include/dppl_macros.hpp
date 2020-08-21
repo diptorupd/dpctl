@@ -34,3 +34,13 @@
 #else
 #    define DPPL_API
 #endif
+
+#ifdef __cplusplus
+#define DPPL_C_EXTERN_C_BEGIN                                                  \
+  extern "C" {
+#define DPPL_C_EXTERN_C_END                                                    \
+  }
+#else
+#define DPPL_C_EXTERN_C_BEGIN
+#define DPPL_C_EXTERN_C_END
+#endif
