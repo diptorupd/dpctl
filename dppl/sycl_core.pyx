@@ -17,10 +17,10 @@
 ## limitations under the License.
 ##
 ##===----------------------------------------------------------------------===##
-###
-### \file
-### This file implements the Cython interface for the Sycl API of PyDPPL.
-###
+##
+## \file
+## This file implements the Cython interface for the Sycl API of PyDPPL.
+##
 ##===----------------------------------------------------------------------===##
 
 # distutils: language = c++
@@ -46,8 +46,11 @@ cdef class UnsupportedDeviceTypeError(Exception):
     '''
     pass
 
-cdef struct DPPLOpaqueSyclQueue
-ctypedef DPPLOpaqueSyclQueue* DPPLSyclQueueRef
+cdef extern from "dppl_sycl_types.h":
+
+    cdef struct DPPLOpaqueSyclQueue:
+        pass
+    ctypedef DPPLOpaqueSyclQueue* DPPLSyclQueueRef
 
 cdef extern from "dppl_sycl_queue_interface.h":
 
