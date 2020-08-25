@@ -120,8 +120,6 @@ TEST_F (TestDPPLSyclQueuemanager, CheckDPPLDumpDeviceInfo)
 }
 
 
-
-
 int
 main (int argc, char** argv)
 {
