@@ -27,9 +27,6 @@
 # cython: language_level=3
 
 from __future__ import print_function
-from libc.stdint cimport int64_t
-from libcpp cimport bool
-from libcpp.memory cimport shared_ptr, make_shared
 from cpython.pycapsule cimport (PyCapsule_New,
                                 PyCapsule_IsValid,
                                 PyCapsule_GetPointer)
@@ -77,8 +74,7 @@ cdef extern from "dppl_sycl_queue_interface.h":
 
 # Destructor for a PyCapsule containing a SYCL queue
 cdef void delete_queue (object cap):
-    cdef void *qref = PyCapsule_GetPointer(cap, NULL)
-    DPPLDeleteQueue(cython.cast(DPPLSyclQueueRef, qref))
+    DPPLDeleteQueue(<DPPLSyclQueueRef>PyCapsule_GetPointer(cap, NULL))
 
 
 cdef class _SyclQueueManager:
@@ -154,7 +150,9 @@ cdef class _SyclQueueManager:
         ''' Prints information about the SYCL queue object.
         '''
         if PyCapsule_IsValid(queue_cap, NULL):
-            DPPLDumpDeviceInfo(PyCapsule_GetPointer(queue_cap, NULL))
+            DPPLDumpDeviceInfo(
+                <DPPLSyclQueueRef>PyCapsule_GetPointer(queue_cap, NULL)
+            )
             return 1
         else:
             raise ValueError("Expected a PyCapsule encapsulating a SYCL queue")
