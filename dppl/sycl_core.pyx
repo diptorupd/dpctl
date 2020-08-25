@@ -49,6 +49,8 @@ cdef class UnsupportedDeviceTypeError(Exception):
     '''
     pass
 
+cdef struct DPPLOpaqueSyclQueue
+ctypedef DPPLOpaqueSyclQueue* DPPLSyclQueueRef
 
 cdef extern from "dppl_sycl_queue_interface.h":
 
@@ -75,7 +77,8 @@ cdef extern from "dppl_sycl_queue_interface.h":
 
 # Destructor for a PyCapsule containing a SYCL queue
 cdef void delete_queue (object cap):
-    DPPLDeleteQueue(PyCapsule_GetPointer(cap, NULL))
+    cdef void *qref = PyCapsule_GetPointer(cap, NULL)
+    DPPLDeleteQueue(cython.cast(DPPLSyclQueueRef, qref))
 
 
 cdef class _SyclQueueManager:
