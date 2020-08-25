@@ -1,4 +1,4 @@
-//===--- dppl_sycl_queue_interface.hpp - DPPL-SYCL interface ---*- C++ -*---===//
+//===--- dppl_sycl_queue_interface.h - DPPL-SYCL interface ---*---C++ -*---===//
 //
 //               Python Data Parallel Processing Library (PyDPPL)
 //
@@ -19,14 +19,25 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// This file contains the wrapper functions to manage SYCL queue objects.
+/// This header declares a C interface to DPPL's sycl::queue manager class that
+/// maintains a thread local stack of sycl::queues objects for use inside
+/// Python programs. The C interface is designed in a way to not have to
+/// include the Sycl headers inside a Python extension module, since that would
+/// require the extension to be compiled using dpc++ or another Sycl compiler.
+/// Compiling the extension with a compiler different from what was used to
+/// compile the Python interpreter can cause run-time problems especially on MS
+/// Windows. Additionally, the C interface makes it easier to interoperate with
+/// Numba without having to deal with C++ name mangling.
 ///
 //===----------------------------------------------------------------------===//
 
 #pragma once
 
-#include "dppl_macros.hpp"
-#include <stdint.h>
+#include "dppl_data_types.h"
+#include "dppl_sycl_types.h"
+#include "Support/DllExport.h"
+#include "Support/ExternC.h"
+#include "Support/MemOwnershipAttrs.h"
 
 DPPL_C_EXTERN_C_BEGIN
 
@@ -35,7 +46,7 @@ DPPL_C_EXTERN_C_BEGIN
  * sycl.hpp here and in the Python bindings.
  *
  */
-enum class dppl_sycl_device_type : unsigned int
+typedef enum
 {
     DPPL_CPU,
     DPPL_GPU,
@@ -44,7 +55,7 @@ enum class dppl_sycl_device_type : unsigned int
     DPPL_AUTOMATIC,
     DPPL_HOST,
     DPPL_ALL
-};
+} DPPLSyclDeviceType;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,147 +63,123 @@ enum class dppl_sycl_device_type : unsigned int
 ////////////////////////////////////////////////////////////////////////////////
 
 /*!
-    * @brief Get the number of sycl::platform available on the system.
-    *
-    * @param    platforms      The number of available sycl::platforms is
-    *                          stored into this param.
-    * @return   error_code     DPPL_SUCCESS if a platforms was updated
-    *                          otherwise DPPL_FAILURE.
-    */
+ * @brief Get the number of sycl::platform available on the system.
+ *
+ * @return The number of available sycl::platforms.
+ */
 DPPL_API
-int64_t DPPLGetNumPlatforms (size_t &platforms);
+size_t DPPLGetNumPlatforms ();
 
 /*!
-    * @brief Get the sycl::queue object that is currently activated for this
-    * thread.
-    *
-    * @param    Ptr2QPtr       The *Ptr2QPtr is allocated with a copy of the
-    *                          current queue.
-    * @return   error_code     DPPL_SUCCESS if a queue exists or DPPL_FAILURE
-    *                          if no queue was currently activated.
-    */
+ * @brief Get the sycl::queue object that is currently activated for this
+ * thread.
+ *
+ * @return A copy of the current (top of the stack) sycl::queue is returned
+ * wrapped inside an opaque DPPLSyclQueueRef pointer.
+ */
 DPPL_API
-int64_t DPPLGetCurrentQueue (void **Ptr2QPtr);
+__dppl_give DPPLSyclQueueRef DPPLGetCurrentQueue ();
 
 /*!
-    * @brief Get a sycl::queue object of the specified type and device id.
-    *
-    * @param    Ptr2QPtr       The *Ptr2QPtr is allocated with a copy of the
-    *                          sycl queue corresponding to this device.
-    * @param    DeviceTy       The type of Sycl device (sycl_device_type)
-    * @param    DNum           Device id for the device (defaults to 0)
-    * @return   error_code     DPPL_SUCCESS if a queue exists or DPPL_FAILURE
-    *                          if no queue of asked for type and id was found.
-    */
+ * @brief Get a sycl::queue object of the specified type and device id.
+ *
+ * @param    DeviceTy       The type of Sycl device (sycl_device_type)
+ * @param    DNum           Device id for the device (defaults to 0)
+ *
+ * @return A copy of the sycl::queue corresponding to the device is returned
+ * wrapped inside a DPPLSyclDeviceType pointer. A runtime_error exception is
+ * raised if no such device exists.
+ */
 DPPL_API
-int64_t DPPLGetQueue (void **Ptr2QPtr,
-                      dppl_sycl_device_type DeviceTy,
-                      size_t DNum = 0);
+__dppl_give DPPLSyclQueueRef DPPLGetQueue (DPPLSyclDeviceType DeviceTy,
+                                           size_t DNum);
 
 /*!
-    * @brief Get the number of activated queues not including the global or
-    * default queue.
-    *
-    * @param    numQueues      Populated with the number of activated queues
-    *                          and returned to caller.
-    * @return   error_code     DPPL_SUCCESS or DPPL_FAILURE
-    */
+ * @brief Get the number of activated queues not including the global or
+ * default queue.
+ *
+ * @return The number of activated queues.
+ */
 DPPL_API
-int64_t DPPLGetNumActivatedQueues (size_t &numQueues);
+size_t DPPLGetNumActivatedQueues ();
 
 /*!
-    * @brief Get the number of GPU queues available on the system.
-    *
-    * @param    numQueues      Populated with the number of available GPU
-    *                          queues and returned to caller.
-    * @return   error_code     DPPL_SUCCESS or DPPL_FAILURE
-    */
+ * @brief Get the number of GPU queues available on the system.
+ *
+ * @return The number of available GPU queues.
+ */
 DPPL_API
-int64_t DPPLGetNumGPUQueues (size_t &numQueues);
+size_t DPPLGetNumGPUQueues ();
 
 /*!
-    * @brief Get the number of CPU queues available on the system.
-    *
-    * @param    numQueues      Populated with the number of available CPU
-    *                          queues and returned to caller.
-    * @return   error_code     DPPL_SUCCESS or DPPL_FAILURE
-    */
+ * @brief Get the number of CPU queues available on the system.
+ *
+ * @return The number of available CPU queues.
+ */
 DPPL_API
-int64_t DPPLGetNumCPUQueues (size_t &numQueues);
+size_t DPPLGetNumCPUQueues ();
 
 /*!
 * @brief Set the default DPPL queue to the sycl::queue for the given device.
 *
+* If no such device is found the a runtime_error exception is thrown.
 *
 * @param    DeviceTy       The type of Sycl device (sycl_device_type)
 * @param    DNum           Device id for the device (defaults to 0)
-* @return   error_code     DPPL_SUCCESS if the default queue was
-*                          successfully set to the asked for device,
-*                          otherwise DPPL_FAILURE.
 */
 DPPL_API
-int64_t DPPLGetAsDefaultQueue (dppl_sycl_device_type DeviceTy, size_t DNum = 0);
+void DPPLSetAsDefaultQueue (DPPLSyclDeviceType DeviceTy,
+                            size_t DNum);
 
 /*!
-    * @brief Sets as the sycl queue corresponding to the specified device as
-    * the currently active DPPL queue, and returns a handle to the queue to
-    * the caller.
-    *
-    * @param    Ptr2QPtr       The *Ptr2QPtr is allocated with a copy of the
-    *                          sycl queue corresponding to this device.
-    * @param    DeviceTy       The type of Sycl device (sycl_device_type)
-    * @param    DNum           Device id for the device (defaults to 0)
-    * @return   error_code     DPPL_SUCCESS if the queue was successfully
-    *                          created, otherwise DPPL_FAILURE.
-    */
+ * @brief Sets as the sycl queue corresponding to the specified device as
+ * the currently active DPPL queue, and returns a copy to the queue to
+ * the caller.
+ *
+ * @param    DeviceTy       The type of Sycl device (sycl_device_type)
+ * @param    DNum           Device id for the device (defaults to 0)
+ *
+ * @return A copy of the sycl::queue corresponding to the current queue for
+ * the thread is returned wrapped inside a DPPLSyclDeviceType pointer. A
+ * runtime_error exception is thrown if no current queue was found (can only
+ * happen is somehow the stack got corrupted, since a default queue should
+ * always exist).
+ */
 DPPL_API
-int64_t DPPLSetAsCurrentQueue (void **Ptr2QPtr,
-                           dppl_sycl_device_type DeviceTy,
-                           size_t DNum);
+__dppl_give DPPLSyclQueueRef DPPLSetAsCurrentQueue (DPPLSyclDeviceType DeviceTy,
+                                                    size_t DNum);
 
 /*!
-    * @brief The current DPPL queue is popped from the stack of activated
-    * queues, except in the scenario where the current queue is the default
-    * queue.
-    *
-    * @return   error_code     DPPL_SUCCESS if the current queue was
-    *                          successfully removed, otherwise DPPL_FAILURE.
-    */
+ * @brief The current DPPL queue is popped from the stack of activated
+ * queues, except in the scenario where the current queue is the default
+ * queue.
+ */
 DPPL_API
-int64_t DPPLRemoveCurrentQueue ();
+void DPPLRemoveCurrentQueue ();
 
 /*!
-    * @brief Prints out information about the Sycl environment, such as
-    * number of available platforms, number of activated queues, etc.
-    *
-    * @return   error_code     DPPL_SUCCESS if the metadata for the queue
-    *                          manager was successfully printed out, otherwise
-    *                          DPPL_FAILURE.
-    */
+ * @brief Prints out information about the Sycl environment, such as
+ * number of available platforms, number of activated queues, etc.
+ */
 DPPL_API
-int64_t DPPLDumpPlatformInfo ();
+void DPPLDumpPlatformInfo ();
 
 /*!
-    * @brief Prints out information about the device corresponding to the
-    * sycl::queue argument.
-    *
-    * @param    QPtr           Pointer to a sycl::queue.
-    * @return   error_code     DPPL_SUCCESS if the metadata for the queue
-    *                          was successfully printed out, otherwise
-    *                          DPPL_FAILURE.
-    */
+ * @brief Prints out information about the device corresponding to the
+ * sycl::queue argument.
+ *
+ * @param    QRef           A DPPLSyclQueueRef pointer whose metadata will be
+ *                          printed out.
+ */
 DPPL_API
-int64_t DPPLDumpDeviceInfo (const void *QPtr);
-
+void DPPLDumpDeviceInfo (__dppl_keep const DPPLSyclQueueRef QRef);
 
 /*!
  * @brief Delete the pointer after static casting it to sycl::queue.
  *
- * @param    QPtr           Pointer to a sycl::queue.
- * @return   error_code     DPPL_SUCCESS if the pointer was deleted, otherwise
- *                          DPPL_FAILURE.
+ * @param    QRef           A DPPLSyclQueueRef pointer that gets deleted.
  */
 DPPL_API
-int64_t DPPLDeleteQueue (void *QPtr);
+void DPPLDeleteQueue (__dppl_take DPPLSyclQueueRef QRef);
 
 DPPL_C_EXTERN_C_END
