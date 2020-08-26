@@ -72,7 +72,6 @@ cdef extern from "dppl_sycl_queue_interface.h":
                                              size_t device_num) except +
     cdef void DPPLSetAsDefaultQueue (_device_type DTy,
                                      size_t device_num) except +
-
     cdef void DPPLDeleteQueue (DPPLSyclQueueRef Q) except +
 
 # Destructor for a PyCapsule containing a SYCL queue
@@ -96,6 +95,7 @@ cdef class _SyclQueueManager:
 
     def _remove_current_queue (self):
         DPPLPopSyclQueue()
+
 
     def has_sycl_platforms (self):
         cdef size_t num_platforms = DPPLGetNumPlatforms()
