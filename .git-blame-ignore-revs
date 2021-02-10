@@ -2,3 +2,6 @@
 
 # Migrate code style to Black
 41ccd65e2e659aa0add0e5ab59f1a46e32cc4c46
+
+# Migrate code style to clang-format
+e7f99a3c8c93054c82f2176218f3611cf32a53f2
