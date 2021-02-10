@@ -132,7 +132,7 @@ void DPCTLPlatform_DumpInfo()
 /*!
  * Returns the number of sycl::platform on the system.
  */
-size_t DPCTLPlatform_GetNumNonHostPlatforms()
+size_t DPCTLPlatform_GetNumNonHostPlatforms ()
 {
     auto nNonHostPlatforms = 0ul;
     for (auto &p : platform::get_platforms()) {
