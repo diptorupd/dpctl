@@ -17,18 +17,12 @@
 """
     **Data Parallel Control (dpctl)**
 
-    Dpctl provides a lightweight Python wrapper over a subset of
-    DPC++/SYCL's API. The goal of dpctl is not (yet) to provide a
-    abstraction for every SYCL function. Dpctl is intended to provide
-    a common runtime to manage specific SYCL resources, such as devices
-    and USM memory, for SYCL-based Python packages and extension modules.
+    Dpctl's Python API implements Python wrappers for a subset of DPC++/SYCL's
+    API. The Python API exposes wrappers for the SYCL runtime classes (expect
+    `device_selector`) described in Section 4.6 of the SYCL 2020 spec (https://www.khronos.org/registry/SYCL/specs/sycl-2020/html/sycl-2020.html#_sycl_runtime_classes).
 
-    The main features presently provided by dpctl are:
+    Apart from the main SYCL runtime classes, dpctl includes a `memory` sub-module that exposes the SYCL USM allocators and deallocators.
 
-    * A SYCL queue manager exposed directly inside the top-level `dpctl`
-      module.
-    * Python wrapper classes for the main SYCL runtime classes mentioned in
-      Section 4.6 of SYCL provisional 2020 spec (https://bit.ly/3asQx07).
 """
 __author__ = "Intel Corp."
 
