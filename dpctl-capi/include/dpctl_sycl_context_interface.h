@@ -37,6 +37,10 @@
 
 DPCTL_C_EXTERN_C_BEGIN
 
+/**
+ * @defgroup ContextInterface Context Interface
+ */
+
 /*!
  * @brief Constructs a new SYCL context for the given SYCL device using the
  * optional async error handler and properties bit flags.
@@ -49,6 +53,7 @@ DPCTL_C_EXTERN_C_BEGIN
  *                          context properties. Currently, dpctl does not use
  *                          this argument.
  * @return   A new opaque pointer wrapping a SYCL context.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 __dpctl_give DPCTLSyclContextRef
@@ -69,6 +74,7 @@ DPCTLContext_Create(__dpctl_keep const DPCTLSyclDeviceRef DRef,
  *                          context properties. Currently, dpctl does not use
  *                          this argument.
  * @return   A new opaque pointer wrapping a SYCL context.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 __dpctl_give DPCTLSyclContextRef
@@ -83,6 +89,7 @@ DPCTLContext_CreateFromDevices(__dpctl_keep const DPCTLDeviceVectorRef DVRef,
  * @param    CtxRef1       First opaque pointer to the sycl context.
  * @param    CtxRef2       Second opaque pointer to the sycl context.
  * @return   True if the underlying sycl::context are same, false otherwise.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 bool DPCTLContext_AreEq(__dpctl_keep const DPCTLSyclContextRef CtxRef1,
@@ -94,6 +101,7 @@ bool DPCTLContext_AreEq(__dpctl_keep const DPCTLSyclContextRef CtxRef1,
  * @param    CRef           DPCTLSyclContextRef object to be copied.
  * @return   A new DPCTLSyclContextRef created by copying the passed in
  * DPCTLSyclContextRef object.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 __dpctl_give DPCTLSyclContextRef
@@ -104,6 +112,7 @@ DPCTLContext_Copy(__dpctl_keep const DPCTLSyclContextRef CRef);
  *
  * @param    CtxRef        An opaque pointer to a sycl::context.
  * @return   True if the SYCL context is a host context, else False.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 bool DPCTLContext_IsHost(__dpctl_keep const DPCTLSyclContextRef CtxRef);
@@ -114,6 +123,7 @@ bool DPCTLContext_IsHost(__dpctl_keep const DPCTLSyclContextRef CtxRef);
  * @param    CtxRef         An opaque pointer to a sycl::context.
  * @return   The sycl backend for the DPCTLSyclContextRef returned as
  * a DPCTLSyclBackendType enum type.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 DPCTLSyclBackendType
@@ -123,6 +133,7 @@ DPCTLContext_GetBackend(__dpctl_keep const DPCTLSyclContextRef CtxRef);
  * @brief Delete the pointer after casting it to sycl::context
  *
  * @param    CtxRef        The DPCTLSyclContextRef pointer to be deleted.
+ * @ingroup ContextInterface
  */
 DPCTL_API
 void DPCTLContext_Delete(__dpctl_take DPCTLSyclContextRef CtxRef);

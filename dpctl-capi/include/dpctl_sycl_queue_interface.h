@@ -38,7 +38,7 @@
 DPCTL_C_EXTERN_C_BEGIN
 
 /**
- * @defgroup QueueInterface sycl::queue class wrapper functions.
+ * @defgroup QueueInterface Queue Interface
  */
 
 /*!
@@ -108,9 +108,10 @@ void DPCTLQueue_Delete(__dpctl_take DPCTLSyclQueueRef QRef);
 /*!
  * @brief Returns a copy of the DPCTLSyclQueueRef object.
  *
- * @param    DRef           DPCTLSyclQueueRef object to be copied.
+ * @param    QRef           DPCTLSyclQueueRef object to be copied.
  * @return   A new DPCTLSyclQueueRef created by copying the passed in
  * DPCTLSyclQueueRef object.
+ * @ingroup QueueInterface
  */
 DPCTL_API
 __dpctl_give DPCTLSyclQueueRef
