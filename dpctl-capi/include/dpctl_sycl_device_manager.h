@@ -35,7 +35,7 @@
 
 DPCTL_C_EXTERN_C_BEGIN
 
-/*! \addtogroup DeviceManager
+/*! \addtogroup DeviceManager Device Manager
  * Helper functions for sycl::device objects that do not directly map to any
  * sycl::device member function.
  * @{

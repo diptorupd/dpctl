@@ -33,7 +33,7 @@
 
 DPCTL_C_EXTERN_C_BEGIN
 
-/*! \addtogroup PlatformManager
+/*! \addtogroup PlatformManager Platform Manager
  * Helper functions for sycl::platform objects that do not directly map to any
  * sycl::platform member function.
  * @{
