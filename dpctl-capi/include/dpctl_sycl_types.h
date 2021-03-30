@@ -74,14 +74,12 @@ typedef struct DPCTLOpaqueSyclProgram *DPCTLSyclProgramRef;
 /*!
  * @brief Opaque pointer to a sycl::queue
  *
- * @see sycl::queue
  */
 typedef struct DPCTLOpaqueSyclQueue *DPCTLSyclQueueRef;
 
 /*!
  * @brief Used to pass a sycl::usm memory opaquely through DPCTL interfaces.
  *
- * @see sycl::usm
  */
 typedef struct DPCTLOpaqueSyclUSM *DPCTLSyclUSMRef;
 

@@ -29,14 +29,6 @@
 #pragma once
 
 /**
- * @defgroup PtrOwnershipAttr Memory management attributes.
- * This file defines a group of macros that serve as attributes indicating the
- * type of ownership of a pointer. The macros are modeled after similar
- * attributes defined in Integer Set Library (isl) and serve the purpose of
- * helping a programmer understand the semantics of a dpctl function.
- */
-
-/**
  * @def __dpctl_give
  * @brief The __dpctl_give attribute indicates that a new object is returned and
  * the caller now owns the object.
@@ -46,7 +38,6 @@
  * free the object, he/she should make sure to use it exactly once as a value
  * for a __dpctl_take argument. However, the user is free to use the object as
  * he/she likes as a value to __dpctl_keep arguments.
- * @ingroup PtrOwnershipAttr
  */
 #ifndef __dpctl_give
 #define __dpctl_give
@@ -62,7 +53,6 @@
  * function. If the pointer annotated with __dpctl_take is NULL then it is
  * treated as an error, since it may prevent the normal behavior of the
  * function.
- * @ingroup PtrOwnershipAttr
  */
 #ifndef __dpctl_take
 #define __dpctl_take
@@ -72,14 +62,12 @@
  * @def __dpctl_keep
  * @brief The __dpctl_keep attribute indicates that the function only uses the
  * object and does not destroy it before returning.
- * @ingroup PtrOwnershipAttr
  */
 #define __dpctl_keep
 #endif
 /*!
  * @def __dpctl_null
  * @brief The __dpctl_null attribute indicates that a NULL value is returned.
- * @ingroup PtrOwnershipAttr
  */
 #ifndef __dpctl_null
 #define __dpctl_null

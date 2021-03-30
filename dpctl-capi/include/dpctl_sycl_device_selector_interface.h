@@ -50,6 +50,7 @@ __dpctl_give DPCTLSyclDeviceSelectorRef DPCTLAcceleratorSelector_Create();
  * @brief Returns an opaque wrapper for sycl::default_selector object.
  *
  * @return An opaque pointer to a sycl::default_selector object.
+ * @ingroup DeviceSelectors
  */
 DPCTL_API
 __dpctl_give DPCTLSyclDeviceSelectorRef DPCTLDefaultSelector_Create();
