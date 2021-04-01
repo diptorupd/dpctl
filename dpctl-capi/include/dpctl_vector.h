@@ -57,7 +57,7 @@ DPCTL_C_EXTERN_C_BEGIN
        @param VRef Opaque pointer to a vector to be deleted.                   \
      */                                                                        \
     DPCTL_API                                                                  \
-    void DPCTL##EL##Vector_Delete(__dpctl_take DPCTL##EL##VectorRef Ref);      \
+    void DPCTL##EL##Vector_Delete(__dpctl_take DPCTL##EL##VectorRef VRef);     \
                                                                                \
     DPCTL_API                                                                  \
     void DPCTL##EL##Vector_Clear(__dpctl_keep DPCTL##EL##VectorRef VRef);      \
