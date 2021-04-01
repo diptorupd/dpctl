@@ -123,7 +123,7 @@ cdef class SyclDevice(_SyclDevice):
 
     """
     @staticmethod
-    cdef void _init_helper(SyclDevice device, DPCTLSyclDeviceRef DRef):
+    cdef void _init_helper(_SyclDevice device, DPCTLSyclDeviceRef DRef):
         device._device_ref = DRef
         device._device_name = DPCTLDevice_GetName(DRef)
         device._driver_version = DPCTLDevice_GetDriverInfo(DRef)
@@ -132,9 +132,16 @@ cdef class SyclDevice(_SyclDevice):
 
     @staticmethod
     cdef SyclDevice _create(DPCTLSyclDeviceRef dref):
-        cdef SyclDevice ret = <SyclDevice>_SyclDevice.__new__(_SyclDevice)
+        """
+        This function calls DPCTLDevice_Delete(dref).
+
+        The user of this function must pass a copy to keep the
+        dref argument alive.
+        """
+        cdef _SyclDevice ret = _SyclDevice.__new__(_SyclDevice)
         # Initialize the attributes of the SyclDevice object
-        SyclDevice._init_helper(ret, dref)
+        SyclDevice._init_helper(<_SyclDevice> ret, dref)
+        # ret is a temporary, and _SyclDevice.__dealloc__ will delete dref
         return SyclDevice(ret)
 
     cdef int _init_from__SyclDevice(self, _SyclDevice other):
@@ -147,10 +154,13 @@ cdef class SyclDevice(_SyclDevice):
             DPCTLDevice_GetMaxWorkItemSizes(self._device_ref)
         )
         self._vendor_name = DPCTLDevice_GetVendorName(self._device_ref)
+        return 0
 
     cdef int _init_from_selector(self, DPCTLSyclDeviceSelectorRef DSRef):
         # Initialize the attributes of the SyclDevice object
         cdef DPCTLSyclDeviceRef DRef = DPCTLDevice_CreateFromSelector(DSRef)
+        # Free up the device selector
+        DPCTLDeviceSelector_Delete(DSRef)
         if DRef is NULL:
             return -1
         else:
@@ -171,8 +181,6 @@ cdef class SyclDevice(_SyclDevice):
                 raise ValueError(
                     "Could not create a SyclDevice with the selector string"
                 )
-            # Free up the device selector
-            DPCTLDeviceSelector_Delete(DSRef)
         elif isinstance(arg, unicode):
             string = bytes(<unicode>unicode(arg), "utf-8")
             filter_c_str = string
@@ -182,8 +190,6 @@ cdef class SyclDevice(_SyclDevice):
                 raise ValueError(
                     "Could not create a SyclDevice with the selector string"
                 )
-            # Free up the device selector
-            DPCTLDeviceSelector_Delete(DSRef)
         elif isinstance(arg, _SyclDevice):
             ret = self._init_from__SyclDevice(arg)
             if ret == -1:
@@ -221,7 +227,7 @@ cdef class SyclDevice(_SyclDevice):
             int: The address of the DPCTLSyclDeviceRef object used to create
             this SyclDevice cast to a size_t.
         """
-        return int(<size_t>self._device_ref)
+        return <size_t>self._device_ref
 
     @property
     def backend(self):

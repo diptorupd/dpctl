@@ -48,16 +48,17 @@ DPCTL_C_EXTERN_C_BEGIN
      */                                                                        \
     DPCTL_API                                                                  \
     __dpctl_give DPCTL##EL##VectorRef DPCTL##EL##Vector_Create();              \
+    DPCTL_API                                                                  \
+    __dpctl_give DPCTL##EL##VectorRef DPCTL##EL##Vector_CreateFromArray(       \
+        size_t len, __dpctl_keep DPCTLSycl##EL##Ref *elems);                   \
+                                                                               \
     /*!                                                                        \
        @brief Delete all elements in the vector and then delete the vector.    \
        @param VRef Opaque pointer to a vector to be deleted.                   \
      */                                                                        \
     DPCTL_API                                                                  \
-    void DPCTL##EL##Vector_Delete(__dpctl_take DPCTL##EL##VectorRef VRef);     \
-    /*!                                                                        \
-       @brief Delete all the elements of the std::vector                       \
-       @param VRef Opaque pointer to a vector.                                 \
-     */                                                                        \
+    void DPCTL##EL##Vector_Delete(__dpctl_take DPCTL##EL##VectorRef Ref);      \
+                                                                               \
     DPCTL_API                                                                  \
     void DPCTL##EL##Vector_Clear(__dpctl_keep DPCTL##EL##VectorRef VRef);      \
     /*!                                                                        \
