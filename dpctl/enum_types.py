@@ -35,10 +35,13 @@ class device_type(Enum):
     ==================   ============
     Device type          Enum value
     ==================   ============
-    gpu                  1
-    cpu                  2
-    accelerator          3
-    host_device          4
+    all                  0
+    accelerator          1
+    automatic            2
+    cpu                  3
+    custom               4
+    gpu                  5
+    host_device          6
     ==================   ============
     """
 
@@ -58,10 +61,11 @@ class backend_type(Enum):
     ==================   ============
     Name of backend      Enum value
     ==================   ============
-    opencl               1
-    level_zero           2
-    cuda                 3
-    host                 4
+    all                  0
+    cuda                 1
+    host                 2
+    level_zero           3
+    opencl               4
     ==================   ============
 
     """
